@@ -21,7 +21,7 @@ class KNN:
         input = self.input
         k = self.k
         labels = self.labels
-        m, n = data.shape
+        m, _ = data.shape
         diff = np.tile(input, (m, 1)) - data       # expand the input data to a match the labelled data
         dist = np.sqrt(np.sum(diff*diff, axis=1))  # so we can calcuate the distance based on a matrix.
         Idx = np.argsort(dist)
@@ -31,7 +31,7 @@ class KNN:
             classCounter[label] += 1
         '''sort based on the value (frequency) in decreasing order'''
         sortedCount = sorted(classCounter.iteritems(), key=lambda x:x[1], reverse=True)
-        
+
         '''assign the label(dict[0][0]) with the most frequency (dict[0]) to the input data'''
         return sortedCount[0][0]
 
