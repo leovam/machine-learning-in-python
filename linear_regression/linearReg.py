@@ -63,6 +63,36 @@ def ridgeReg(xMat, yMat, lam=0.2):
 stageWise: greedy aglorithm
 reduce the error at each step
 '''
+def rssError(yMat, yMatHat):
+    return ((yMat-yMatHat)**2).sum()
+
+def regularize(xMat):                    # regularize by column
+    inMat = xMat.copy()
+    inMean = np.mean(inMat, axis=0)      # substract mean from the value
+    inVar = np.var(inMat, axis=0)        # calculate the variance
+    inMat = (inMat - inMean) / inVar
+    return inMat
+
 def stageWise(xMat, yMat, eps=0.01, maxIter=100):
+    yMat = yMat - np.mean(yMat, axis=0)
+    xMat = regularize(xMat)
     m, n = xMat.shape
-    
+    returnMat = np.zeros((maxIter, n))
+    ws = np.zeros((n,1))
+    wsTest = ws.copy()
+    wsMax = ws.copy()
+    for i in range(maxIter):
+        lowestError = np.inf
+        for j in range(n):
+            for sign in [-1, 1]:
+                wsTest = ws.copy()
+                wsTest[j] += eps * sign
+                yTest = xMat * wsTest
+                rssE = rssError(yMat, yTest)
+                if rssE < lowestError:
+                    lowestError = rssE
+                    wsMax = wsTest
+        ws = wsMax.copy()
+        returnMat[i,:] = ws.T
+
+    return returnMat
